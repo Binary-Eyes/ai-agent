@@ -28,6 +28,9 @@ All paths you provide should be relative to the working directory. You do not ne
     available_functions = types.Tool(
         function_declarations=[
             generate_get_files_info_schema(),
+            generate_write_file_schema(),
+            generate_get_file_contents_schema(),
+            generate_run_python_file_schema()
         ]
     )
 
@@ -46,7 +49,7 @@ All paths you provide should be relative to the working directory. You do not ne
             print(f"Calling function: {function_call_part.name}({function_call_part.args})")
     else:
         print(response.text)
-        
+
     if is_verbose_enabled(sys.argv):
         print_verbose(user_prompt, response)
 
