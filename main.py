@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from functions.funcdecl import *
 
 def main():
     if len(sys.argv) < 2:
@@ -24,14 +25,26 @@ All paths you provide should be relative to the working directory. You do not ne
         types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
+    available_functions = types.Tool(
+        function_declarations=[
+            generate_get_files_info_schema(),
+        ]
+    )
+
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
     response = client.models.generate_content(
         model=model, 
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=system_prompt))
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=system_prompt))
     
+    if len(response.function_calls) > 0:
+        for function_call_part in response.function_calls:
+            print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+
     print(response.text)
     if is_verbose_enabled(sys.argv):
         print_verbose(user_prompt, response)
