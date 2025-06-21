@@ -41,11 +41,12 @@ All paths you provide should be relative to the working directory. You do not ne
             tools=[available_functions],
             system_instruction=system_prompt))
     
-    if len(response.function_calls) > 0:
+    if response.function_calls is not None:
         for function_call_part in response.function_calls:
             print(f"Calling function: {function_call_part.name}({function_call_part.args})")
-
-    print(response.text)
+    else:
+        print(response.text)
+        
     if is_verbose_enabled(sys.argv):
         print_verbose(user_prompt, response)
 
