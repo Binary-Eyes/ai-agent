@@ -18,14 +18,19 @@ def run_python_file(working_directory, file_path):
         completed = subprocess.run(
             args=["python3", path], 
             timeout=30,
-            working_directory=root,
             capture_output=True,
             text=True,
             cwd=os.path.dirname(path))
         
         output = ""
+        if completed.returncode != 0:
+            output += f"\nProcess exited with code {completed.returncode}"
+        
         if len(completed.stdout) > 0:
-            output += f"STDOUT: {completed.stdout}"
+            output += f"STDOUT:{completed.stdout}\n"
+
+        if len(completed.stderr) > 0:
+            output += f"STDERR:{completed.stderr}\n"
 
         if len(output) == 0:
             output = "No output produced"
