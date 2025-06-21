@@ -9,7 +9,8 @@ def write_file(working_directory, file_path, content):
     
         if not os.path.isfile(path):
             file_dir = os.path.dirname(path)
-            os.mkdir(file_dir)
+            if not os.path.isdir(file_dir):
+                os.mkdir(file_dir)
 
         with open(path, "w") as f:
             f.write(content)
