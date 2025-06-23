@@ -3,6 +3,7 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from functions.call_function import call_function
 from functions.funcdecl import *
 
 def main():
@@ -19,6 +20,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 
+    is_verbose = is_verbose_enabled(sys.argv)
     model = "gemini-2.0-flash-001"
     user_prompt = sys.argv[1]
     messages = [
@@ -46,11 +48,15 @@ All paths you provide should be relative to the working directory. You do not ne
     
     if response.function_calls is not None:
         for function_call_part in response.function_calls:
-            print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+            result = call_function(function_call_part)
+            if result.parts[0].function_response.response is None:
+                raise Exception(f"called function failed to return: {function_call_part.name}")
+            if is_verbose:
+                print(f"-> {result.parts[0].function_response.response}")
     else:
         print(response.text)
 
-    if is_verbose_enabled(sys.argv):
+    if is_verbose:
         print_verbose(user_prompt, response)
 
 

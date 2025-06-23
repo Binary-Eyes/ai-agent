@@ -29,7 +29,7 @@ def call_function(function_call_part, verbose=False):
             ]
         )
     
-    function_result = func_map[function_name]
+    function_result = func_map[function_name]("./calculator", **function_call_part.args)
     return types.Content(
     role="tool",
     parts=[
