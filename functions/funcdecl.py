@@ -38,7 +38,7 @@ def generate_run_python_file_schema():
 
 def generate_get_file_contents_schema():
     return types.FunctionDeclaration(
-        name="get_file_contents",
+        name="get_file_content",
         description="Reads and returns the content of a given file based on its path, constrained to the working directory.",
         parameters=types.Schema(
             type=types.Type.OBJECT,
