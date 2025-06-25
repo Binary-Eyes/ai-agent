@@ -39,22 +39,29 @@ All paths you provide should be relative to the working directory. You do not ne
     load_dotenv()
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(
-        model=model, 
-        contents=messages,
-        config=types.GenerateContentConfig(
-            tools=[available_functions],
-            system_instruction=system_prompt))
-    
-    if response.function_calls is not None:
-        for function_call_part in response.function_calls:
-            result = call_function(function_call_part)
-            if result.parts[0].function_response.response is None:
-                raise Exception(f"called function failed to return: {function_call_part.name}")
-            if is_verbose:
-                print(f"-> {result.parts[0].function_response.response}")
-    else:
-        print(response.text)
+    for i in range(0, 20):
+        response = client.models.generate_content(
+            model=model, 
+            contents=messages,
+            config=types.GenerateContentConfig(
+                tools=[available_functions],
+                system_instruction=system_prompt))
+        
+        for candidate in response.candidates:
+            messages.append(candidate.content)
+
+        if response.function_calls is not None:
+            for function_call_part in response.function_calls:
+                result = call_function(function_call_part)
+                if result.parts[0].function_response.response is None:
+                    raise Exception(f"called function failed to return: {function_call_part.name}")
+                
+                messages.append(result)
+                if is_verbose:
+                    print(f"-> {result.parts[0].function_response.response}")
+        else:
+            print(response.text)
+            break
 
     if is_verbose:
         print_verbose(user_prompt, response)
